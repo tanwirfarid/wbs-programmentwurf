@@ -7,6 +7,8 @@
 ; Ein bewertetes Beispiel ist eine Liste der Attributwerte sowie eine Bewertung "ja" "nein"
 
 (setq *path-to-vs* "C:/TEMP/ball_lernen.lsp")
+(setq  *path-to-training-data* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_D2.lisp")
+(setq *path-to-testdata* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_TestD2.lisp")
 
 (DEFUN  LOAD-EXAMPLESET (Filename)
    (LET ((STREAM (OPEN Filename :DIRECTION :INPUT)))
@@ -160,3 +162,19 @@
 
 (format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car examples) )
 )))
+
+(defun startAQ (filename)
+  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil))
+    (do ((examples (cdr (get-examplelist exampleFile))
+                   (cdr examples))
+         (n 0 (+ n 1)))
+		((null examples) nil)
+		(cond ((null examples) nil)
+			((equal "ja" (cadar examples))
+				(push (car examples) bplus ))
+			(T(push (car examples) bminus ))
+		)		
+	)
+	(print bminus)
+	(print bplus)
+))
