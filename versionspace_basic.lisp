@@ -153,7 +153,7 @@
 
 ;do version-space algorithm for every positive example combined with all negatives, return G
 (defun version-space (examples)
-  (let ((exampleFile (load-exampleset filename)))
+  (let ((dataset examples))
     (do ((dataset examples (cdr examples))
          (VS (initVS (length (car (get-header dataset))))
              (version-space-step (caar dataset) (cadar dataset) VS))
@@ -167,13 +167,12 @@
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (bplus bminus k s)
 	(cond ((null bplus) nil)
-	(T (
-		(let (s 
+	(T (push(car 
+		(let ((s 
 				(version-space (cons (car bplus) bminus ))
-			  )
-		)
+			  ))
+		) )k
 		;add best rule from s to k, initially choose first one
-		(push (car s) k)
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
 		)
 	)
