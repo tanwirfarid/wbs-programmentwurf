@@ -167,10 +167,14 @@
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (bplus bminus k s)
 	(cond ((null bplus) nil)
-	(T 
+	(T (
 		(let (s 
 				(version-space (cons (car bplus) bminus ))
 			  )
+		)
+		;add best rule from s to k, initially choose first one
+		(push (car s) k)
+		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
 		)
 	)
 	)
