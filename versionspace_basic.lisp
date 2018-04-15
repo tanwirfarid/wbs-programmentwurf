@@ -151,20 +151,33 @@
         (T (cons (eval (car dataSet))
                  (get-examplelist (cdr dataSet))))))
 
-(defun version-space (filename)
+;do version-space algorithm for every positive example combined with all negatives, return G
+(defun version-space (examples)
   (let ((exampleFile (load-exampleset filename)))
-    (do ((examples (cdr (get-examplelist exampleFile))
-                   (cdr examples))
-         (VS (initVS (length (car (get-header exampleFile))))
-             (version-space-step (caar examples) (cadar examples) VS))
+    (do ((dataset examples (cdr examples))
+         (VS (initVS (length (car (get-header dataset))))
+             (version-space-step (caar dataset) (cadar dataset) VS))
          (n 0 (+ n 1)))
-        ((NULL examples) VS)
+        ((NULL dataset) (get-G VS))
 
-(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car examples) )
+;(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car examples) )
 )))
 
+;while bplus not empty run versionspace for each positive example
+;call version-space with list created by combining first positive and all negative examples
+(defun aq-step (bplus bminus k s)
+	(cond ((null bplus) nil)
+	(T 
+		(let (s 
+				(version-space (cons (car bplus) bminus ))
+			  )
+		)
+	)
+	)
+)
+
 (defun startAQ (filename)
-  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil))
+  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil)(k nil)(s nil))
     (do ((examples (cdr (get-examplelist exampleFile))
                    (cdr examples))
          (n 0 (+ n 1)))
@@ -175,6 +188,9 @@
 			(T(push (car examples) bminus ))
 		)		
 	)
-	(print bminus)
-	(print bplus)
+	(aq-step bminus bplus k s)
+	;(print bminus)
+	;(print bplus)
 ))
+
+
