@@ -166,21 +166,45 @@
 )
 ;while bplus not empty run versionspace for each positive example
 ;call version-space with list created by combining first positive and all negative examples
-(defun aq-step (bplus bminus k s)
+(defun aq-step (br bminus k s)
 	;(print (cons (car bplus) bminus))
-	(cond ((null bplus) nil)
-	(T (push(car 
-				(let ((s 
-						(version-space (cons (car bplus) bminus ))
-					  ))
-				) 
-			)
-		k)
+	(cond ((null br) nil)
+	(T ((let ((s
+      (car (version-space (cons (car br) bminus ))
+      ))))
+     ()
+     (push s k)
+  )
 		;add best rule from s to k, initially choose first one
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
-		
+
 	)
 	)
+)
+
+(defun remove-covered-exemples (brelement s)
+  (cond ((null brelement) NIL)
+        (T ((do ((bremainder    brelement     (cdr bremainder))
+                 (sentry        s             (cdr sentry)))
+              (null bremainder)
+              (cond ((not (EQUAL sentry *star*))
+                     (cond ((not (EQUAL sentry bremainder)))
+
+                     )))
+  ))))
+)
+
+(defun remove-covered-examples (br s)
+  (cond ((null br) NIL)
+        (())
+))
+
+(defun check-if-covered (brelement s)
+  (cond ((null brelement) T)
+        ((EQUAL (car s) *star*) (check-if-covered (cdr brelement) (cdr s)))
+        ((EQUAL (car s) (car brelement)) (check-if-covered (cdr brelement) (cdr s)))
+        (T F)
+  )
 )
 
 (defun startAQ (filename)
@@ -193,12 +217,10 @@
 			((equal "ja" (cadar examples))
 				(push (car examples) bplus ))
 			(T(push (car examples) bminus ))
-		)		
+		)
 	)
-	
+
 	(aq-step bplus bminus k s)
 	;(print bminus)
 	;(print bplus)
 ))
-
-
