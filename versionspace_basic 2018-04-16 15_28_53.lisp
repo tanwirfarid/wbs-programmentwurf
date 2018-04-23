@@ -151,40 +151,20 @@
         (T (cons (eval (car dataSet))
                  (get-examplelist (cdr dataSet))))))
 
-;do version-space algorithm for every positive example combined with all negatives, return G
-(defun version-space (examples)
-  (let ((dataset (length examples)))
-    (do ((exampleset examples (cdr exampleset))
-         (VS (initVS (length (caar examples)))
-             (version-space-step (caar exampleset) (cadar exampleset) VS))
+(defun version-space (filename)
+  (let ((exampleFile (load-exampleset filename)))
+    (do ((examples (cdr (get-examplelist exampleFile))
+                   (cdr examples))
+         (VS (initVS (length (car (get-header exampleFile))))
+             (version-space-step (caar examples) (cadar examples) VS))
          (n 0 (+ n 1)))
-        ((null exampleset) (get-G VS))
+        ((NULL examples) VS)
 
-		(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car exampleset) )
-	)
-  )
-)
-;while bplus not empty run versionspace for each positive example
-;call version-space with list created by combining first positive and all negative examples
-(defun aq-step (bplus bminus k s)
-	;(print (cons (car bplus) bminus))
-	(cond ((null bplus) nil)
-	(T (push(car 
-				(let ((s 
-						(version-space (cons (car bplus) bminus ))
-					  ))
-				) 
-			)
-		k)
-		;add best rule from s to k, initially choose first one
-		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
-		
-	)
-	)
-)
+(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car examples) )
+)))
 
 (defun startAQ (filename)
-  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil)(k nil)(s nil))
+  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil)(k nil))
     (do ((examples (cdr (get-examplelist exampleFile))
                    (cdr examples))
          (n 0 (+ n 1)))
@@ -195,10 +175,6 @@
 			(T(push (car examples) bminus ))
 		)		
 	)
-	
-	(aq-step bplus bminus k s)
 	;(print bminus)
 	;(print bplus)
 ))
-
-
