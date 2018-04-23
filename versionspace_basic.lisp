@@ -194,9 +194,11 @@
   ))))
 )
 
-(defun remove-covered-examples (br s)
+(defun remove-covered-examples (br s br-without-s)
   (cond ((null br) NIL)
-        (())
+        ((check-if-covered (car br) s) (remove-covered-examples (cdr br) s br-without-s))
+        (T (cons br-without-s car br) (cons br-without-s (car br)) (remove-covered-examples (cdr br) s br-without-s))
+
 ))
 
 (defun check-if-covered (brelement s)
