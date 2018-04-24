@@ -224,4 +224,19 @@
 )
 )
 
-(startAQ "Wohnungskartei_D2.lisp")
+(defun classify (testdata k)
+	(cond ((null testdata) nil)
+		(T (
+				(do ((iterate-k       k       (cdr k))
+					 )
+				   ((null iterate-k)(classify (cdr testdata) k))
+				   (check-if-covered (car testdata) iterate-k)
+				)
+		
+			)
+		)
+	)
+
+)
+
+(startAQ "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_D2.lisp")
