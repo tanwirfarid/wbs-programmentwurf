@@ -227,7 +227,7 @@
 (defun classify (testdata k)
 	(cond ((null testdata) nil)
 		(T (
-				(do ((iterate-k       k       (cdr k))
+				(do ((iterate-k       k       (cdr iterate-k))
 					 )
 				   ((null iterate-k)(classify (cdr testdata) k))
 				   (check-if-covered (car testdata) iterate-k)
