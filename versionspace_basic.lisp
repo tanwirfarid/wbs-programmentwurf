@@ -1,3 +1,7 @@
+;Programmentwurf
+;Matrikelnummern:  8204492, 9282448
+
+
 ; Load-Exampleset
 ; ---------------
 ; Liest eine Beispieldatei und trennt die Kopfzeile ab
@@ -6,9 +10,6 @@
 ; 2. Element : Eine Liste von Listen, die jeweils einem bewerteten Beispiel entsprechen
 ; Ein bewertetes Beispiel ist eine Liste der Attributwerte sowie eine Bewertung "ja" "nein"
 
-(setq *path-to-vs* "")
-(setq  *path-to-training-data* "")
-(setq *path-to-testdata* "")
 ;
 (DEFUN  LOAD-EXAMPLESET (Filename)
    (LET ((STREAM (OPEN Filename :DIRECTION :INPUT)))
