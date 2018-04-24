@@ -6,10 +6,10 @@
 ; 2. Element : Eine Liste von Listen, die jeweils einem bewerteten Beispiel entsprechen
 ; Ein bewertetes Beispiel ist eine Liste der Attributwerte sowie eine Bewertung "ja" "nein"
 
-(setq *path-to-vs* "")
-(setq  *path-to-training-data* "")
-(setq *path-to-testdata* "")
-;
+(setq *path-to-vs* "C:/TEMP/ball_lernen.lsp")
+(setq  *path-to-training-data* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_D2.lisp")
+(setq *path-to-testdata* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_TestD2.lisp")
+
 (DEFUN  LOAD-EXAMPLESET (Filename)
    (LET ((STREAM (OPEN Filename :DIRECTION :INPUT)))
          (LET ((CATEGORYNAMES (READ STREAM NIL STREAM))
@@ -160,40 +160,31 @@
          (n 0 (+ n 1)))
         ((null exampleset) (get-G VS))
 
-		;(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car exampleset) )
+		(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car exampleset) )
 	)
   )
 )
 ;while bplus not empty run versionspace for each positive example
 ;call version-space with list created by combining first positive and all negative examples
-(defun aq-step (br bminus k s)
-  (let ((br-without-s NIL))
-	(cond ((null br) k)
-	(T (let ((s
-      (car (version-space (cons (car br) bminus))
-      )))
-
-     (push s k)
-     (aq-step (remove-covered-examples (cdr br) s br-without-s) bminus k s) ;(remove-covered-examples (cdr br) s br-without-s)
-  ))
+(defun aq-step (bplus bminus k s)
+	;(print (cons (car bplus) bminus))
+	(cond ((null bplus) nil)
+	(T (push(car 
+				(let ((s 
+						(version-space (cons (car bplus) bminus ))
+					  ))
+				) 
+			)
+		k)
 		;add best rule from s to k, initially choose first one
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
-)))
+		
+	)
+	)
+)
 
-
-(defun remove-covered-examples (br s br-without-s)
-  (cond ((null br) br-without-s)
-        ((is-included (car br) (list s)) (remove-covered-examples (cdr br) s br-without-s))
-        (T (remove-covered-examples (cdr br) s (cons (car br) br-without-s)))))
-
-(defun check-if-covered (brelement s)
-  (cond ((OR (NULL brelement) (NULL s)) T)
-        ((EQUAL (car s) *star*) (check-if-covered (cdr brelement) (cdr s)))
-        ((EQUAL (car s) (car brelement)) (check-if-covered (cdr brelement) (cdr s)))
-        (T NIL)))
-
-(defun learn-concept (filename)
-  (let ((exampleFile (load-exampleset filename)) (bminus nil) (bplus nil) (k nil) (s nil))
+(defun startAQ (filename)
+  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil)(k nil)(s nil))
     (do ((examples (cdr (get-examplelist exampleFile))
                    (cdr examples))
          (n 0 (+ n 1)))
@@ -201,20 +192,13 @@
 		(cond ((null examples) nil)
 			((equal "ja" (cadar examples))
 				(push (car examples) bplus ))
-			(T (push (car examples) bminus ))))
-	(aq-step bplus bminus k s)))
-
-(defun classify (k filename)
-  (let ((testdata (get-examplelist (load-exampleset filename))))
-  (classifier k testdata)
+			(T(push (car examples) bminus ))
+		)		
+	)
+	
+	(aq-step bplus bminus k s)
+	;(print bminus)
+	;(print bplus)
 ))
 
-(defun classifier (k testdata)
-	(cond ((null testdata) nil)
-		    (T (cond ((AND (is-included (caar testdata) k) (equal "ja" (cadar testdata))) (print "true positive"));          Falls die Testdaten vom Konzept angenommen werden, und der "Teacher" in den Testdaten dies auch vorsieht.
-                               ((AND (is-included (caar testdata) k) (equal "nein" (cadar testdata))) (print "false negative"));       Falls die Testdaten vom Konzept abgelehnt werden, aber der "Teacher" in den Testdaten dies nicht so vorsieht.
-                               ((AND (not (is-included (caar testdata) k)) (equal "nein" (cadar testdata))) (print "true negative"));  Falls die Testdaten vom Konzept abgelehnt werden, und der "Teacher" in den Testdaten dies auch so vorsieht.
-                               ((AND (not (is-included (caar testdata) k)) (equal "ja" (cadar testdata))) (print "false positive"));   Falls die Testdaten vom Konzept angenommen werden, aber der "Teacher" in den Testdaten dies nicht vorsieht.
-                               (T (print "Liste komplett durchlaufen.")))(classifier k (cdr testdata)))))
 
-(classify (learn-concept "Wohnungskartei_D2.lisp") "Wohnungskartei_TestD2.lisp")
