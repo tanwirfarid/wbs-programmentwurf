@@ -152,7 +152,7 @@
         (T (cons (eval (car dataSet))
                  (get-examplelist (cdr dataSet))))))
 
-;do version-space algorithm for every positive example combined with all negatives, return G
+;Versionenraummethode anwenden, G zurückgeben
 (defun version-space (examples)
   (let ((dataset (length examples)))
     (do ((exampleset examples (cdr exampleset))
