@@ -167,42 +167,30 @@
 ;while bplus not empty run versionspace for each positive example
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (br bminus k s)
-  ;(print 'hi)
   (let ((br-without-s NIL))
-	;(print (cons (car bplus) bminus))
 	(cond ((null br) k)
 	(T (let ((s
       (car (version-space (cons (car br) bminus))
       )))
 
-     (print s)
-     ;(print (remove-covered-examples (cdr br) s br-without-s))
      (push s k)
-      ;(print (remove-covered-examples (cdr br) s br-without-s))
-     (aq-step (remove-covered-examples (cdr br) s br-without-s) bminus k s)
+     (aq-step (remove-covered-examples (cdr br) s br-without-s) bminus k s) ;(remove-covered-examples (cdr br) s br-without-s)
   ))
 		;add best rule from s to k, initially choose first one
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
-
-	))
-	)
+)))
 
 
 (defun remove-covered-examples (br s br-without-s)
-  ;(print br-without-s)
   (cond ((null br) br-without-s)
-        ((check-if-covered (caar br) s) (remove-covered-examples (cdr br) s br-without-s))
-        (T (remove-covered-examples (cdr br) s (cons (car br) br-without-s)))
-
-))
+        ((is-included (car br) (list s)) (remove-covered-examples (cdr br) s br-without-s))
+        (T (remove-covered-examples (cdr br) s (cons (car br) br-without-s)))))
 
 (defun check-if-covered (brelement s)
   (cond ((OR (NULL brelement) (NULL s)) T)
         ((EQUAL (car s) *star*) (check-if-covered (cdr brelement) (cdr s)))
         ((EQUAL (car s) (car brelement)) (check-if-covered (cdr brelement) (cdr s)))
-        (T NIL)
-  )
-)
+        (T NIL)))
 
 (defun startAQ (filename)
   (let ((exampleFile (load-exampleset filename)) (bminus nil) (bplus nil) (k nil) (s nil))
@@ -213,30 +201,20 @@
 		(cond ((null examples) nil)
 			((equal "ja" (cadar examples))
 				(push (car examples) bplus ))
-			(T (push (car examples) bminus ))
-		)
-	)
+			(T (push (car examples) bminus ))))
+	(aq-step bplus bminus k s)))
 
-	(print (aq-step bplus bminus k s))
+(defun classify (k filename)
+  (let ((testdata (get-examplelist (load-exampleset filename))))
+  (classifier k testdata)
+))
 
-	;(print bminus)
-	;(print bplus)
-)
-)
-
-(defun classify (testdata k)
+(defun classifier (k testdata)
 	(cond ((null testdata) nil)
-		(T (
-				(do ((iterate-k       k       (cdr iterate-k))
-					 )
-				   ((null iterate-k)(classify (cdr testdata) k))
-				   (check-if-covered (car testdata) iterate-k)
-				)
-		
-			)
-		)
-	)
+		    (T (cond ((AND (is-included (caar testdata) k) (equal "ja" (cadar testdata))) (print "true positive"));          Falls die Testdaten vom Konzept angenommen werden, und der "Teacher" in den Testdaten dies auch vorsieht.
+                               ((AND (is-included (caar testdata) k) (equal "nein" (cadar testdata))) (print "false negative"));       Falls die Testdaten vom Konzept abgelehnt werden, aber der "Teacher" in den Testdaten dies nicht so vorsieht.
+                               ((AND (not (is-included (caar testdata) k)) (equal "nein" (cadar testdata))) (print "true negative"));  Falls die Testdaten vom Konzept abgelehnt werden, und der "Teacher" in den Testdaten dies auch so vorsieht.
+                               ((AND (not (is-included (caar testdata) k)) (equal "ja" (cadar testdata))) (print "false positive"));   Falls die Testdaten vom Konzept angenommen werden, aber der "Teacher" in den Testdaten dies nicht vorsieht.
+                               (T (print "Liste komplett durchlaufen.")))(classifier k (cdr testdata)))))
 
-)
-
-(startAQ "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_D2.lisp")
+(classify (startAQ "Wohnungskartei_D2.lisp") "Wohnungskartei_TestD2.lisp")
