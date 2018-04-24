@@ -9,7 +9,7 @@
 (setq *path-to-vs* "C:/TEMP/ball_lernen.lsp")
 (setq  *path-to-training-data* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_D2.lisp")
 (setq *path-to-testdata* "C:/Users/milius/OneDrive - Hewlett Packard Enterprise/DHBW/6. Semester/WBS/wbs-programmentwurf/Wohnungskartei_TestD2.lisp")
-
+;
 (DEFUN  LOAD-EXAMPLESET (Filename)
    (LET ((STREAM (OPEN Filename :DIRECTION :INPUT)))
          (LET ((CATEGORYNAMES (READ STREAM NIL STREAM))
@@ -160,7 +160,7 @@
          (n 0 (+ n 1)))
         ((null exampleset) (get-G VS))
 
-		(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car exampleset) )
+		;(format T "S = ~S ~% G = ~S ~% New Example: ~2D - ~S ~% " (get-S VS) (get-G VS) n (car exampleset) )
 	)
   )
 )
@@ -168,11 +168,14 @@
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (br bminus k s)
 	;(print (cons (car bplus) bminus))
+  (setf br-without-s NIL)
 	(cond ((null br) nil)
-	(T ((let ((s
+	(T (let ((s
       (car (version-space (cons (car br) bminus ))
-      ))))
-     ()
+      )))
+     (remove-covered-examples br s br-without-s)
+     (print s)
+     (print br-without-s)
      (push s k)
   )
 		;add best rule from s to k, initially choose first one
@@ -182,23 +185,10 @@
 	)
 )
 
-(defun remove-covered-exemples (brelement s)
-  (let ((br-without-s NIL)))
-  (cond ((null brelement) NIL)
-        (T ((do ((bremainder    brelement     (cdr bremainder))
-                 (sentry        s             (cdr sentry)))
-              (null bremainder)
-              (cond ((not (EQUAL sentry *star*))
-                     (cond ((not (EQUAL sentry bremainder)))
-
-                     )))
-  ))))
-)
-
 (defun remove-covered-examples (br s br-without-s)
   (cond ((null br) NIL)
         ((check-if-covered (car br) s) (remove-covered-examples (cdr br) s br-without-s))
-        (T (cons br-without-s (car br)) (remove-covered-examples (cdr br) s br-without-s))
+        (T (cons (car br) br-without-s) (remove-covered-examples (cdr br) s br-without-s))
 
 ))
 
@@ -206,7 +196,7 @@
   (cond ((null brelement) T)
         ((EQUAL (car s) *star*) (check-if-covered (cdr brelement) (cdr s)))
         ((EQUAL (car s) (car brelement)) (check-if-covered (cdr brelement) (cdr s)))
-        (T F)
+        (T (not T))
   )
 )
 
