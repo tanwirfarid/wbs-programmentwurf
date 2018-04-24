@@ -168,16 +168,17 @@
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (br bminus k s)
 	;(print (cons (car bplus) bminus))
-  (setf br-without-s NIL)
+  (let ((br-without-s NIL))
 	(cond ((null br) nil)
 	(T (let ((s
       (car (version-space (cons (car br) bminus ))
       )))
      (remove-covered-examples br s br-without-s)
-     (print s)
-     (print br-without-s)
+     ;(print s)
+     ;(print br-without-s)
      (push s k)
-  )
+     (aq-step (cdr br) bminus k s)
+  ))
 		;add best rule from s to k, initially choose first one
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
 
@@ -217,3 +218,5 @@
 	;(print bminus)
 	;(print bplus)
 ))
+
+(startAQ "Wohnungskartei_D2.lisp")
