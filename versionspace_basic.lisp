@@ -183,6 +183,7 @@
 )
 
 (defun remove-covered-exemples (brelement s)
+  (let ((br-without-s NIL)))
   (cond ((null brelement) NIL)
         (T ((do ((bremainder    brelement     (cdr bremainder))
                  (sentry        s             (cdr sentry)))
@@ -197,7 +198,7 @@
 (defun remove-covered-examples (br s br-without-s)
   (cond ((null br) NIL)
         ((check-if-covered (car br) s) (remove-covered-examples (cdr br) s br-without-s))
-        (T (cons br-without-s car br) (cons br-without-s (car br)) (remove-covered-examples (cdr br) s br-without-s))
+        (T (cons br-without-s (car br)) (remove-covered-examples (cdr br) s br-without-s))
 
 ))
 
