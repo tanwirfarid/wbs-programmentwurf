@@ -167,42 +167,45 @@
 ;while bplus not empty run versionspace for each positive example
 ;call version-space with list created by combining first positive and all negative examples
 (defun aq-step (br bminus k s)
-	;(print (cons (car bplus) bminus))
+  ;(print 'hi)
   (let ((br-without-s NIL))
-	(cond ((null br) nil)
+	;(print (cons (car bplus) bminus))
+	(cond ((null br) k)
 	(T (let ((s
-      (car (version-space (cons (car br) bminus ))
+      (car (version-space (cons (car br) bminus))
       )))
-     (remove-covered-examples br s br-without-s)
-     ;(print s)
-     ;(print br-without-s)
+
+     (print s)
+     ;(print (remove-covered-examples (cdr br) s br-without-s))
      (push s k)
-     (aq-step (cdr br) bminus k s)
+      ;(print (remove-covered-examples (cdr br) s br-without-s))
+     (aq-step (remove-covered-examples (cdr br) s br-without-s) bminus k s)
   ))
 		;add best rule from s to k, initially choose first one
 		;now remove all hypotheses from bplus, already covered by new rule and call new aq-step
 
+	))
 	)
-	)
-)
+
 
 (defun remove-covered-examples (br s br-without-s)
-  (cond ((null br) NIL)
-        ((check-if-covered (car br) s) (remove-covered-examples (cdr br) s br-without-s))
-        (T (cons (car br) br-without-s) (remove-covered-examples (cdr br) s br-without-s))
+  ;(print br-without-s)
+  (cond ((null br) br-without-s)
+        ((check-if-covered (caar br) s) (remove-covered-examples (cdr br) s br-without-s))
+        (T (remove-covered-examples (cdr br) s (cons (car br) br-without-s)))
 
 ))
 
 (defun check-if-covered (brelement s)
-  (cond ((null brelement) T)
+  (cond ((OR (NULL brelement) (NULL s)) T)
         ((EQUAL (car s) *star*) (check-if-covered (cdr brelement) (cdr s)))
         ((EQUAL (car s) (car brelement)) (check-if-covered (cdr brelement) (cdr s)))
-        (T (not T))
+        (T NIL)
   )
 )
 
 (defun startAQ (filename)
-  (let ((exampleFile (load-exampleset filename))(bminus nil)(bplus nil)(k nil)(s nil))
+  (let ((exampleFile (load-exampleset filename)) (bminus nil) (bplus nil) (k nil) (s nil))
     (do ((examples (cdr (get-examplelist exampleFile))
                    (cdr examples))
          (n 0 (+ n 1)))
@@ -210,13 +213,15 @@
 		(cond ((null examples) nil)
 			((equal "ja" (cadar examples))
 				(push (car examples) bplus ))
-			(T(push (car examples) bminus ))
+			(T (push (car examples) bminus ))
 		)
 	)
 
-	(aq-step bplus bminus k s)
+	(print (aq-step bplus bminus k s))
+
 	;(print bminus)
 	;(print bplus)
-))
+)
+)
 
 (startAQ "Wohnungskartei_D2.lisp")
